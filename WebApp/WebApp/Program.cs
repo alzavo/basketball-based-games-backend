@@ -23,7 +23,7 @@ using var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>()
 using var ctx = serviceScope.ServiceProvider.GetService<AppDbContext>();
 if (ctx != null) 
 {
-    DataInit.SeedGamesData(ctx);
+    //DataInit.SeedGamesData(ctx);
 }
 
 /////////////

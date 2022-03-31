@@ -1,9 +1,4 @@
 ﻿using Domain.App;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DAL.App.EF.DataInit
 {
@@ -18,7 +13,23 @@ namespace DAL.App.EF.DataInit
                 Language = "en",
             };
 
+            var gameMinus5 = new Game
+            {
+                Name = "-5",
+                Description = "Another game for chidlren.",
+                Language = "en",
+            };
+
+            var game21 = new Game
+            {
+                Name = "21",
+                Description = "Simple active game.",
+                Language = "en",
+            };
+
             ctx.Games.Add(game33);
+            ctx.Games.Add(gameMinus5);
+            ctx.Games.Add(game21);
             ctx.SaveChanges();
         }
     }
