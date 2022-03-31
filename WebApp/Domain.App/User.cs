@@ -1,19 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace Domain.App
 {
-    public class User
+    public class User : IdentityUser<int>
     {
-        [Key]
-        [Required]
-        public int Id { get; set; }
-
-        [StringLength(30)]
-        public string Name { get; set; } = null!;
-
-        [StringLength(50)]
-        public string UserName { get; set; } = null!;
-
         public ICollection<PlayedGame>? PlayedGames { get; set; }
 
         // friends which User chooses

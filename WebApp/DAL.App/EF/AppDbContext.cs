@@ -1,14 +1,17 @@
 ﻿using Domain.App;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.App.EF
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<User, Role, int>
     {
         public DbSet<Game> Games { get; set; } = null!;
-        public DbSet<User> Users { get; set; } = null!;
         public DbSet<PlayedGame> PlayedGames { get; set; } = null!;
         public DbSet<Friendship> Friendships { get; set; } = null!;
+
+        public override DbSet<User> Users { get; set; } = null!;
+        public override DbSet<Role> Roles { get; set; } = null!;
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
