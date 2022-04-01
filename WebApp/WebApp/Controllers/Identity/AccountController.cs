@@ -1,4 +1,4 @@
-﻿using Domain.App;
+﻿using Entity = Domain.App;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PublicApi.DTO.v1;
@@ -10,12 +10,12 @@ namespace WebApp.Controllers.Identity
     public class AccountController : ControllerBase
     {
 
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<Entity.User> _signInManager;
+        private readonly UserManager<Entity.User> _userManager;
         private readonly ILogger<AccountController> _logger;
         private readonly IConfiguration _configuration;
 
-        public AccountController(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<AccountController> logger, IConfiguration configuration)
+        public AccountController(SignInManager<Entity.User> signInManager, UserManager<Entity.User> userManager, ILogger<AccountController> logger, IConfiguration configuration)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -33,7 +33,7 @@ namespace WebApp.Controllers.Identity
                 return BadRequest(new Message("User already registered!"));
             }
 
-            user = new User()
+            user = new Entity.User()
             {
                 UserName = dto.UserName,
             };

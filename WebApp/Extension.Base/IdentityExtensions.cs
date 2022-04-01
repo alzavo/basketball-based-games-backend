@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Extension.Base
 {
-    public class IdentityExtensions
+    public static class IdentityExtensions
     {
-        public static int? GetUserId(ClaimsPrincipal user)
+        public static int? GetUserId(this ClaimsPrincipal user)
         {
 
             var userId = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;

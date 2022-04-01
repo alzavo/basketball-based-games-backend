@@ -24,6 +24,7 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IEnumerable<Game>> Get()
         {
             _logger.LogInformation("Get all games");
@@ -61,7 +62,7 @@ namespace WebApp.Controllers
         {
             var game = await _context.Games.FindAsync(id);
             if (game == null) return NotFound();
-            _context.Remove(game);
+            _context.Games.Remove(game);
             await _context.SaveChangesAsync();
             return NoContent();
         }
