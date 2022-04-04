@@ -40,8 +40,25 @@ builder.Services
         });
 
 builder.Services
-    .AddIdentity<User, Role>(options => { options.SignIn.RequireConfirmedAccount = false; })
+    .AddIdentity<User, Role>(options => { 
+        options.SignIn.RequireConfirmedAccount = false; 
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequiredUniqueChars = 0;
+        options.Password.RequireDigit = false;
+    })
     .AddEntityFrameworkStores<AppDbContext>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsAllowAll", builder =>
+    {
+        builder.AllowAnyHeader();
+        builder.AllowAnyMethod();
+        builder.AllowAnyOrigin();
+    });
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -60,16 +77,12 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-/////////////
-
 using var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
 using var ctx = serviceScope.ServiceProvider.GetService<AppDbContext>();
 if (ctx != null) 
 {
     //DataInit.SeedGamesData(ctx);
 }
-
-/////////////
 
 
 if (app.Environment.IsDevelopment())
@@ -79,7 +92,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("CorsAllowAll");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
