@@ -47,6 +47,7 @@ builder.Services
         options.Password.RequireLowercase = false;
         options.Password.RequiredUniqueChars = 0;
         options.Password.RequireDigit = false;
+        options.Password.RequiredLength = 1;
     })
     .AddEntityFrameworkStores<AppDbContext>();
 

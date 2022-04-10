@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebApp.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UsersController : ControllerBase
@@ -25,10 +25,22 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        public async Task<IEnumerable<User>> Get()
+        public async Task<IEnumerable<User>> GetAll()
         {
             return await _context.Users.Select(user => UserMapper.Map(user)).ToListAsync();
+        }
+
+        [HttpGet("{name}")]
+        public async Task<IEnumerable<User>> GetAllByName(string name)
+        {
+            var userId = User.GetUserId()!.Value;
+            return await _context.Users
+                .Where(user => !user.Id.Equals(userId))
+                .Where(user => user.UserName.Contains(name))
+                .Include(user => user.FriendshipsWithUser)
+                .Where(user => !user.FriendshipsWithUser!.Any(friendship => friendship.UserId.Equals(userId)))
+                .Select(user => UserMapper.Map(user))
+                .ToListAsync();
         }
 
         [HttpGet("{id}")]

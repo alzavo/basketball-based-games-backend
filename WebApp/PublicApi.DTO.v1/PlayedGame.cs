@@ -35,10 +35,16 @@ namespace PublicApi.DTO.v1
     public class PlayedGameCreate
     {
         public int Place { get; set; }
+
         public int Points { get; set; }
 
         public int UserId { get; set; }
 
         public int GameId { get; set; }
+    }
+
+    public class PlayedGameAllUsers
+    {
+        public ICollection<PlayedGameCreate> PlayedGames { get; set; } = null!;
     }
 }

@@ -58,7 +58,8 @@ namespace WebApp.Controllers.Identity
                     return Ok(new JwtResponse()
                     {
                         Token = jwt,
-                        UserName = appUser.UserName
+                        UserName = appUser.UserName,
+                        UserId = appUser.Id,
                     });
                 }
 
@@ -97,7 +98,8 @@ namespace WebApp.Controllers.Identity
                 return Ok(new JwtResponse()
                 {
                     Token = jwt,
-                    UserName = user.UserName
+                    UserName = user.UserName,
+                    UserId = user.Id,
                 });
             }
 
