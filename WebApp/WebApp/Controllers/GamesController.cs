@@ -1,4 +1,4 @@
-﻿using DAL.App.EF;
+﻿using DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,60 +10,58 @@ namespace WebApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class GamesController : ControllerBase
     {
 
-        private readonly AppDbContext _context;
         private readonly ILogger<GamesController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GamesController(AppDbContext context, ILogger<GamesController> logger) 
+        public GamesController(ILogger<GamesController> logger, IUnitOfWork unitOfWork) 
         {
-            _context = context;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IEnumerable<Game>> Get()
+        public async Task<ActionResult<IEnumerable<Game>>> Get()
         {
-            _logger.LogInformation("Get all games");
-            return await _context.Games.Select(game => GameMapper.Map(game)).ToListAsync();
+            return Ok(await _unitOfWork.Games.GetAllAsync());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Game>> Get(int id)
+        public async Task<ActionResult<Game?>> Get(int id)
         {
-            var result = await _context.Games.FindAsync(id);
-            if (result == null) return NotFound();
-            return GameMapper.Map(result);
+            var dto = await _unitOfWork.Games.GetOneAsync(id);
+            if (dto != null) return Ok(dto);
+            return NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Game>> Post([FromBody] GameCreate game)
+        public async Task<ActionResult<Game>> Post([FromBody] Game game)
         {
-            var addedGame = _context.Games.Add(GameMapper.Map(game)).Entity;
-            await _context.SaveChangesAsync();
-            var returnedGame = GameMapper.Map(addedGame);
-            return Created("", returnedGame);
+            _unitOfWork.Games.Add(game);
+            await _unitOfWork.SaveChangesAsync();
+            return Ok();
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Game>> Put(int id, [FromBody] GameUpdate game)
+        public async Task<ActionResult<Game>> Put(int id, [FromBody] Game game)
         {
             if (id != game.Id) return BadRequest();
-            _context.Games.Update(GameMapper.Map(game));
-            await _context.SaveChangesAsync();
+            _unitOfWork.Games.Edit(game);
+            await _unitOfWork.SaveChangesAsync();
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var game = await _context.Games.FindAsync(id);
-            if (game == null) return NotFound();
-            _context.Games.Remove(game);
-            await _context.SaveChangesAsync();
+            var dto = await _unitOfWork.Games.GetOneAsync(id);
+            if (dto == null) return NotFound();
+            _unitOfWork.Games.Delete(dto);
+            await _unitOfWork.SaveChangesAsync();
             return NoContent();
         }
     }

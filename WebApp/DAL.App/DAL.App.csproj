@@ -16,7 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DAL.Base\DAL.Base.csproj" />
     <ProjectReference Include="..\Domain.App\Domain.App.csproj" />
+    <ProjectReference Include="..\PublicApi.DTO.v1\PublicApi.DTO.v1.csproj" />
   </ItemGroup>
 
 </Project>

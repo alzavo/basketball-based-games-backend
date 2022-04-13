@@ -2,7 +2,7 @@
 
 namespace Domain.App
 {
-    public class PlayedGame
+    public class PlayedGame 
     {
         [Key]
         [Required]

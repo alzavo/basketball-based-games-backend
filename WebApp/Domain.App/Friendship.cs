@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.App
 {
-    public class Friendship
+    public class Friendship 
     {
         [Key]
         [Required]

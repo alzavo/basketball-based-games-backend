@@ -1,8 +1,10 @@
-﻿namespace PublicApi.DTO.v1.Mapper
+﻿using Mapping;
+
+namespace PublicApi.DTO.v1.Mapper
 {
-    public class GameMapper
+    public class GameMapper : IMapper<Domain.App.Game, PublicApi.DTO.v1.Game>
     {
-        public static Game Map(Domain.App.Game game)
+        public PublicApi.DTO.v1.Game Map(Domain.App.Game game)
         {
             return new Game() 
             {
@@ -13,17 +15,7 @@
             };
         }
 
-        public static Domain.App.Game Map(GameCreate game)
-        {
-            return new Domain.App.Game()
-            {
-                Name = game.Name,
-                Description = game.Description,
-                Language = game.Language,
-            };
-        }
-
-        public static Domain.App.Game Map(GameUpdate game)
+        public Domain.App.Game Map(PublicApi.DTO.v1.Game game)
         {
             return new Domain.App.Game()
             {

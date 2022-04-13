@@ -1,5 +1,7 @@
+using DAL;
 using DAL.App.EF;
 using DAL.App.EF.DataInit;
+using DAL.App.UnitOfWork;
 using Domain.App;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +19,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
          .EnableDetailedErrors()
          .EnableSensitiveDataLogging()
      );
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 builder.Services

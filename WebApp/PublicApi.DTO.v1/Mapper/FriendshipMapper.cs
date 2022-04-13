@@ -8,7 +8,7 @@ namespace PublicApi.DTO.v1.Mapper
 {
     public class FriendshipMapper
     {
-        public static Friendship Map(Domain.App.Friendship friendship) 
+        public static PublicApi.DTO.v1.Friendship Map(Domain.App.Friendship friendship) 
         {
             return new Friendship()
             {
