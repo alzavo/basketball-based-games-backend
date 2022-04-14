@@ -7,7 +7,7 @@ using DAL;
 
 namespace WebApp.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class FriendshipsController : ControllerBase

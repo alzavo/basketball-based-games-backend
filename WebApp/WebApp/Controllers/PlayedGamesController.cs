@@ -1,11 +1,9 @@
-﻿using DAL.App.EF;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PublicApi.DTO.v1;
-using PublicApi.DTO.v1.Mapper;
 using Extension.Base;
+using DAL;
 
 namespace WebApp.Controllers
 {
@@ -15,37 +13,27 @@ namespace WebApp.Controllers
     public class PlayedGamesController : ControllerBase
     {
 
-        private readonly AppDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<PlayedGamesController> _logger;
 
-        public PlayedGamesController(AppDbContext context, ILogger<PlayedGamesController> logger)
+        public PlayedGamesController(IUnitOfWork unitOfWork, ILogger<PlayedGamesController> logger)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<PlayedGame>> Get()
+        public async Task<ActionResult<IEnumerable<PlayedGame>>> Get()
         {
-            return await _context.PlayedGames
-                .Where(pg => pg.UserId.Equals(User.GetUserId()!.Value))
-                .Include(pg => pg.Game)
-                .Include(pg => pg.User)
-                .Select(pg => PlayedGameMapper.Map(pg)).ToListAsync();
-
-
+            return Ok(await _unitOfWork.PlayedGames.GetAllDetailedAsync(User.GetUserId()!.Value));
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<PlayedGame>> Get(int id)
         {
-            var result = await _context.PlayedGames
-                .Include(pg => pg.Game)
-                .Include(pg => pg.User)
-                .FirstAsync(pg => pg.Id.Equals(id));
-
-            if (result == null) return NotFound();
-            return PlayedGameMapper.Map(result);
+            var dto = await _unitOfWork.PlayedGames.GetOneDetailedAsync(id, User.GetUserId()!.Value);
+            if (dto != null) return Ok(dto);
+            return NotFound();
         }
 
         [HttpPost]
@@ -53,29 +41,19 @@ namespace WebApp.Controllers
         {
             foreach (var game in dto.PlayedGames) 
             {
-                var addedGame = _context.PlayedGames.Add(PlayedGameMapper.Map(game)).Entity;
+                _unitOfWork.PlayedGames.Add(game);
             }
-            await _context.SaveChangesAsync();
-
-            return Created("", null);
-        }
-
-        [HttpPut]
-        public async Task<ActionResult<PlayedGame>> Put(int id, [FromBody] PlayedGameUpdate game)
-        {
-            if (id != game.Id) return BadRequest();
-            _context.PlayedGames.Update(PlayedGameMapper.Map(game));
-            await _context.SaveChangesAsync();
-            return NoContent();
+            await _unitOfWork.SaveChangesAsync();
+            return Ok();
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var game = await _context.PlayedGames.FindAsync(id);
+            var game = await _unitOfWork.PlayedGames.GetOneAsync(id);
             if (game == null) return NotFound();
-            _context.PlayedGames.Remove(game);
-            await _context.SaveChangesAsync();
+            _unitOfWork.PlayedGames.Delete(game);
+            await _unitOfWork.SaveChangesAsync();
             return NoContent();
         }
     }

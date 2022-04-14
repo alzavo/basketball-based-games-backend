@@ -16,11 +16,13 @@ namespace DAL.App.UnitOfWork
             Games = new GamesRepository(_context, new GameMapper());
             Users = new UsersRepository(_context, new UserMapper(), userManager);
             Friendships = new FriendshipsRepository(_context, new FriendshipMapper());
+            PlayedGames = new PlayedGamesRepository(_context, new PlayedGameMapper());
         }
 
         public IGamesRepository Games { get; set; }
         public IUsersRepository Users { get; set; }
         public IFriendshipsRepository Friendships { get; set; }
+        public IPlayedGamesRepository PlayedGames { get; set; }
 
         public async Task<int> SaveChangesAsync()
         {
