@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mapping;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace PublicApi.DTO.v1.Mapper
 {
-    public class UserMapper
+    public class UserMapper : IMapper<Domain.App.User, PublicApi.DTO.v1.User>
     {
-        public static User Map(Domain.App.User user)
+        public User Map(Domain.App.User user)
         {
             return new User()
             {
@@ -20,7 +21,7 @@ namespace PublicApi.DTO.v1.Mapper
             };
         }
 
-        public static Domain.App.User Map(UserUpdate user)
+        public Domain.App.User Map(PublicApi.DTO.v1.User user)
         {
             return new Domain.App.User()
             {

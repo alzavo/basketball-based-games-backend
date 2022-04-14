@@ -8,10 +8,4 @@
         public int PersonalFriendshipsCount { get; set; }
         public int FriendshipsWithUserCount { get; set; }
     }
-
-    public class UserUpdate
-    {
-        public int Id { get; set; }
-        public string UserName { get; set; } = null!;
-    }
 }

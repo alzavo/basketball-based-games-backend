@@ -1,11 +1,10 @@
-﻿using DAL.App.EF;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using PublicApi.DTO.v1;
-using PublicApi.DTO.v1.Mapper;
 using Extension.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using DAL;
+using Microsoft.AspNetCore.Identity;
 
 namespace WebApp.Controllers
 {
@@ -15,56 +14,48 @@ namespace WebApp.Controllers
     public class UsersController : ControllerBase
     {
 
-        private readonly AppDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<UsersController> _logger;
+        private readonly UserManager<Domain.App.User> _userManager;
 
-        public UsersController(AppDbContext context, ILogger<UsersController> logger)
+        public UsersController(IUnitOfWork context, ILogger<UsersController> logger, UserManager<Domain.App.User> userManager)
         {
-            _context = context;
+            _unitOfWork = context;
             _logger = logger;
+            _userManager = userManager;
         }
 
         [HttpGet]
         public async Task<IEnumerable<User>> GetAll()
         {
-            return await _context.Users.Select(user => UserMapper.Map(user)).ToListAsync();
+            return await _unitOfWork.Users.GetAllAsync();
         }
 
-        [HttpGet("{name}")]
-        public async Task<IEnumerable<User>> GetAllByName(string name)
+        [HttpGet("{phrase}")]
+        public async Task<IEnumerable<User>> GetAll(string phrase)
         {
-            var userId = User.GetUserId()!.Value;
-            return await _context.Users
-                .Where(user => !user.Id.Equals(userId))
-                .Where(user => user.UserName.Contains(name))
-                .Include(user => user.FriendshipsWithUser)
-                .Where(user => !user.FriendshipsWithUser!.Any(friendship => friendship.UserId.Equals(userId)))
-                .Select(user => UserMapper.Map(user))
-                .ToListAsync();
+            return await _unitOfWork.Users.GetAllBySearchPhraseAsync(phrase, User.GetUserId()!.Value);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> Get(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
-            if (user.Id != User.GetUserId()!.Value) return BadRequest();
-            return UserMapper.Map(user);
+            if (id != User.GetUserId()!.Value) return BadRequest();
+            var user = await _unitOfWork.Users.GetOneDetailedAsync(id);
+            if (user != null) return Ok(user);
+            return NotFound();
         }
 
-
-        // add scoped for repository in program.cs, that creates every time new scoped instance (DI for AppDbContext)
         [HttpPut("{id}")]
-        public async Task<ActionResult<User>> Put(int id, [FromBody] UserUpdate userUpdate)
+        public async Task<ActionResult> Put(int id, [FromBody] User dto) 
         {
-            if (userUpdate.Id != id) return BadRequest();
+            if (!id.Equals(dto.Id) || !id.Equals(User.GetUserId()!.Value)) return BadRequest();
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
-            if (user.Id != User.GetUserId()!.Value) return BadRequest();
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (await _userManager.FindByNameAsync(dto.UserName) != null) return BadRequest();
 
-            _context.Users.Update(UserMapper.Map(userUpdate));
-            await _context.SaveChangesAsync();
+            user.UserName = dto.UserName;
+            await _userManager.UpdateAsync(user);
 
             return NoContent();
         }
@@ -72,12 +63,8 @@ namespace WebApp.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
-            if (user.Id != User.GetUserId()!.Value) return BadRequest();
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            if (id != User.GetUserId()!.Value) return BadRequest();
+            await _unitOfWork.Users.DeleteAsync(id);
             return NoContent();
         }
     }

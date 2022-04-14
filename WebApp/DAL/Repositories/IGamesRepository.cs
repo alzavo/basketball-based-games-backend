@@ -5,6 +5,5 @@ namespace DAL.Repositories
 {
     public interface IGamesRepository : IRepository<int, Entity, Dto>
     {
-        // custom methods
     }
 }
