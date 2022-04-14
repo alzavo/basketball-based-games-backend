@@ -18,9 +18,9 @@ namespace WebApp.Controllers
         private readonly ILogger<UsersController> _logger;
         private readonly UserManager<Domain.App.User> _userManager;
 
-        public UsersController(IUnitOfWork context, ILogger<UsersController> logger, UserManager<Domain.App.User> userManager)
+        public UsersController(IUnitOfWork unitOfWork, ILogger<UsersController> logger, UserManager<Domain.App.User> userManager)
         {
-            _unitOfWork = context;
+            _unitOfWork = unitOfWork;
             _logger = logger;
             _userManager = userManager;
         }

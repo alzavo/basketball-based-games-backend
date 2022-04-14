@@ -6,6 +6,7 @@ namespace DAL
     {
         IGamesRepository Games { get; }
         IUsersRepository Users { get; }
+        IFriendshipsRepository Friendships { get; }
         Task<int> SaveChangesAsync();
     }
 }

@@ -16,20 +16,4 @@ namespace PublicApi.DTO.v1
         public int FriendId { get; set; }
         public string FriendName { get; set; } = null!;
     }
-
-    public class FriendshipUpdate
-    {
-        public int Id { get; set; }
-
-        public int UserId { get; set; }
-
-        public int FriendId { get; set; }
-    }
-
-    public class FriendshipCreate
-    {
-        public int UserId { get; set; }
-
-        public int FriendId { get; set; }
-    }
 }

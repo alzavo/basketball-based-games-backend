@@ -1,14 +1,11 @@
-﻿using DAL.App.EF;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PublicApi.DTO.v1;
-using Mapper = PublicApi.DTO.v1.Mapper.FriendshipMapper;
 using Extension.Base;
+using DAL;
 
-
-namespace WebApp.Controllers.Identity
+namespace WebApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -16,61 +13,48 @@ namespace WebApp.Controllers.Identity
     public class FriendshipsController : ControllerBase
     {
 
-        private readonly AppDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<FriendshipsController> _logger;
 
-        public FriendshipsController(AppDbContext context, ILogger<FriendshipsController> logger)
+        public FriendshipsController(IUnitOfWork unitOfWork, ILogger<FriendshipsController> logger)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Friendship>> Get()
+        public async Task<ActionResult<IEnumerable<Friendship>>> Get()
         {
-            return await _context.Friendships
-                .Where(f => f.UserId.Equals(User.GetUserId()))
-                .Include(f => f.User)
-                .Include(f => f.Friend)
-                .Select(f => Mapper.Map(f)).ToListAsync();
+            return Ok(await _unitOfWork.Friendships.GetAllDetailedAsync(User.GetUserId()!.Value));
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Friendship>> Get(int id)
         {
-            var result = await _context.Friendships
-                .Include(f => f.User)
-                .Include(f => f.Friend)
-                .FirstAsync(f => f.Id.Equals(id));
-
-            if (result == null) return NotFound();
-            return Mapper.Map(result);
+            var dto = await _unitOfWork.Friendships.GetOneDetailedAsync(id);
+            if (dto != null)
+            {
+                if (!dto.UserId.Equals(User.GetUserId()!.Value)) return BadRequest();
+                return Ok(dto);
+            }
+            return NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Friendship>> Post([FromBody] FriendshipCreate friendship)
+        public async Task<ActionResult<Friendship>> Post([FromBody] Friendship dto)
         {
-            var addedFriendship = _context.Friendships.Add(Mapper.Map(friendship)).Entity;
-            await _context.SaveChangesAsync();
-            return Created("", addedFriendship);
-        }
-
-        [HttpPut]
-        public async Task<ActionResult<Friendship>> Put(int id, [FromBody] FriendshipUpdate friendship)
-        {
-            if (id != friendship.Id) return BadRequest();
-            _context.Friendships.Update(Mapper.Map(friendship));
-            await _context.SaveChangesAsync();
-            return NoContent();
+            _unitOfWork.Friendships.Add(dto);
+            await _unitOfWork.SaveChangesAsync();
+            return Ok();
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var friendship = await _context.Friendships.FindAsync(id);
-            if (friendship == null) return NotFound();
-            _context.Friendships.Remove(friendship);
-            await _context.SaveChangesAsync();
+            var dto = await _unitOfWork.Friendships.GetOneAsync(id);
+            if (dto == null) return NotFound();
+            _unitOfWork.Friendships.Delete(dto);
+            await _unitOfWork.SaveChangesAsync();
             return NoContent();
         }
     }

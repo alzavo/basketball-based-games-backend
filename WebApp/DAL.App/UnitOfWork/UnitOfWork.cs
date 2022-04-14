@@ -15,10 +15,12 @@ namespace DAL.App.UnitOfWork
             _context = context;
             Games = new GamesRepository(_context, new GameMapper());
             Users = new UsersRepository(_context, new UserMapper(), userManager);
+            Friendships = new FriendshipsRepository(_context, new FriendshipMapper());
         }
 
         public IGamesRepository Games { get; set; }
         public IUsersRepository Users { get; set; }
+        public IFriendshipsRepository Friendships { get; set; }
 
         public async Task<int> SaveChangesAsync()
         {
