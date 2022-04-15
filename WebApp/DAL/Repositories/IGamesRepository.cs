@@ -5,5 +5,6 @@ namespace DAL.Repositories
 {
     public interface IGamesRepository : IRepository<int, Entity, Dto>
     {
+        Task<IEnumerable<Dto>> GetAllDetailedAsync();
     }
 }

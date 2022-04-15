@@ -28,18 +28,6 @@ namespace WebApp.Controllers
             return Ok(await _unitOfWork.Friendships.GetAllDetailedAsync(User.GetUserId()!.Value));
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Friendship>> Get(int id)
-        {
-            var dto = await _unitOfWork.Friendships.GetOneDetailedAsync(id);
-            if (dto != null)
-            {
-                if (!dto.UserId.Equals(User.GetUserId()!.Value)) return BadRequest();
-                return Ok(dto);
-            }
-            return NotFound();
-        }
-
         [HttpPost]
         public async Task<ActionResult<Friendship>> Post([FromBody] Friendship dto)
         {

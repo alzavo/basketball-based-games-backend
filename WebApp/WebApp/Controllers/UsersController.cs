@@ -26,15 +26,15 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<User>> GetAll()
+        public async Task<ActionResult<IEnumerable<User>>> Get()
         {
-            return await _unitOfWork.Users.GetAllAsync();
+            return Ok(await _unitOfWork.Users.GetAllAsync());
         }
 
         [HttpGet("{phrase}")]
-        public async Task<IEnumerable<User>> GetAll(string phrase)
+        public async Task<ActionResult<IEnumerable<User>>> GetByPhrase(string phrase)
         {
-            return await _unitOfWork.Users.GetAllBySearchPhraseAsync(phrase, User.GetUserId()!.Value);
+            return Ok(await _unitOfWork.Users.GetAllBySearchPhraseAsync(phrase, User.GetUserId()!.Value));
         }
 
         [HttpGet("{id}")]

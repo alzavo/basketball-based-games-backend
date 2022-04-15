@@ -6,12 +6,13 @@ namespace PublicApi.DTO.v1.Mapper
     {
         public PublicApi.DTO.v1.Game Map(Domain.App.Game game)
         {
-            return new Game() 
+            return new Game()
             {
                 Id = game.Id,
                 Name = game.Name,
                 Description = game.Description,
                 Language = game.Language,
+                PlayedGamesCount = game.PlayedGames?.Count ?? 0,
             };
         }
 

@@ -28,14 +28,6 @@ namespace WebApp.Controllers
             return Ok(await _unitOfWork.PlayedGames.GetAllDetailedAsync(User.GetUserId()!.Value));
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PlayedGame>> Get(int id)
-        {
-            var dto = await _unitOfWork.PlayedGames.GetOneDetailedAsync(id, User.GetUserId()!.Value);
-            if (dto != null) return Ok(dto);
-            return NotFound();
-        }
-
         [HttpPost]
         public async Task<ActionResult<PlayedGame>> Post([FromBody] PlayedGameAllUsers dto)
         {

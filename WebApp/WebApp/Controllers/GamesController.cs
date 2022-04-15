@@ -25,16 +25,7 @@ namespace WebApp.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Game>>> Get()
         {
-            return Ok(await _unitOfWork.Games.GetAllAsync());
-        }
-
-        [HttpGet("{id}")]
-        [AllowAnonymous]
-        public async Task<ActionResult<Game>> Get(int id)
-        {
-            var dto = await _unitOfWork.Games.GetOneAsync(id);
-            if (dto != null) return Ok(dto);
-            return NotFound();
+            return Ok(await _unitOfWork.Games.GetAllDetailedAsync());
         }
     }
 }
